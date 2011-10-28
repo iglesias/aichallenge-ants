@@ -5,7 +5,7 @@ using namespace std;
 //constructor
 Bot::Bot()
 {
-
+  map< Location, Location > orders;
 };
 
 //plays a single game of Ants.
@@ -48,6 +48,30 @@ void Bot::makeMoves()
 
     state.bug << "time taken: " << state.timer.getTime() << "ms" << endl << endl;
 };
+
+bool Bot::doMoveDirection(const Location & antLoc, int dir)
+{
+  Location newLoc = state.getLocation( antLoc, dir );
+  if ( state.isFree( newLoc ) && orders.find( newLoc ) == orders.end() )
+  {
+    state.makeMove( antLoc, dir );
+    orders.insert( pair< Location, Location >( newLoc, antLoc ) );
+    printf(">>>>>>> (%d, %d) added to orders\n", newLoc.row, newLoc.col);
+    return true;
+  }
+  else
+    return false;
+}
+
+void Bot::doTurn()
+{
+  orders.clear();
+
+  for ( uint antIdx = 0 ; antIdx < state.myAnts.size() ; ++antIdx )
+    for ( int d = 0 ; d < TDIRECTIONS ; ++d )
+      if ( doMoveDirection( state.myAnts[ antIdx ], d ) ) break;
+
+}
 
 //finishes the turn
 void Bot::endTurn()

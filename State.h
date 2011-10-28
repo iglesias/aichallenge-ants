@@ -58,7 +58,10 @@ struct State
     void makeMove(const Location &loc, int direction);
 
     double distance(const Location &loc1, const Location &loc2);
+
     Location getLocation(const Location &startLoc, int direction);
+
+    bool isFree(const Location & loc);
 
     void updateVisionInformation();
 };

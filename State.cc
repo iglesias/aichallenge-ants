@@ -63,6 +63,16 @@ Location State::getLocation(const Location &loc, int direction)
                      (loc.col + DIRECTIONS[direction][1] + cols) % cols );
 };
 
+bool State::isFree(const Location & loc)
+{
+  for ( uint antIdx = 0 ; antIdx < myAnts.size() ; ++antIdx )
+    if ( grid[loc.row][loc.col].isWater || loc == myAnts[ antIdx ] ) 
+      return false;
+
+  return true;
+}
+
+
 /*
     This function will update update the lastSeen value for any squares currently
     visible by one of your live ants.
