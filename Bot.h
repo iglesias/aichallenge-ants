@@ -14,6 +14,9 @@ struct Bot
 
     std::map< Location, Location > orders;
 
+    // This map tracks the foods targets and associated ants
+    std::map< Location, Location > targets;
+
     Bot();
 
     void playGame();    //plays a single game of Ants
@@ -21,6 +24,8 @@ struct Bot
     void makeMoves();   //makes moves for a single turn
 
     bool doMoveDirection(const Location & antLoc, int direction);
+
+    bool doMoveLocation(const Location & antLoc, const Location & destLoc);
 
     void doTurn();
 

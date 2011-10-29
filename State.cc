@@ -57,11 +57,38 @@ double State::distance(const Location &loc1, const Location &loc2)
 };
 
 //returns the new location from moving in a given direction with the edges wrapped
-Location State::getLocation(const Location &loc, int direction)
+Location State::getLocation(const Location & loc, int direction)
 {
     return Location( (loc.row + DIRECTIONS[direction][0] + rows) % rows,
                      (loc.col + DIRECTIONS[direction][1] + cols) % cols );
 };
+
+int State::getDirection
+(
+  const Location & antLoc, 
+  const Location & destLoc,
+  std::array< int, 2 > & directions
+)
+{
+  int ndirs = 0;
+
+  // Check vertical direction
+  if ( antLoc.row < destLoc.row )
+    // Move to the north
+    directions[ ndirs++ ] = 0;
+  else if ( antLoc.row > destLoc.row )
+    // Move to the south
+    directions[ ndirs++ ] = 2;
+
+  // Check horizontal direction
+  if ( antLoc.col < destLoc.col )
+    // Move to the east
+    directions[ ndirs++ ] = 1;
+  else if ( antLoc.col > destLoc.col )
+    directions[ ndirs++ ] = 3;
+
+  return ndirs;
+}
 
 bool State::isFree(const Location & loc)
 {

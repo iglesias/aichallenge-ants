@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <cmath>
+#include <array>
 #include <string>
 #include <vector>
 #include <queue>
@@ -59,7 +60,18 @@ struct State
 
     double distance(const Location &loc1, const Location &loc2);
 
-    Location getLocation(const Location &startLoc, int direction);
+    Location getLocation(const Location & loc, int direction);
+
+    // Output the direction(s) of the movement(s) to take from antLoc to destLoc
+    // \return the number of directions, 0 or 1, and populate \param directions 
+    
+    // TODO Take into account that the map wraps around
+    int getDirection
+    (
+      const Location & antLoc, 
+      const Location & destLoc, 
+      std::array< int, 2 > & directions
+    );
 
     bool isFree(const Location & loc);
 

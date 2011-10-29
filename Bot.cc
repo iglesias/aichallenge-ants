@@ -1,3 +1,5 @@
+#include <array>
+
 #include "Bot.h"
 
 using namespace std;
@@ -6,6 +8,7 @@ using namespace std;
 Bot::Bot()
 {
   map< Location, Location > orders;
+  map< Location, Location > targets;
 };
 
 //plays a single game of Ants.
@@ -20,7 +23,8 @@ void Bot::playGame()
     while(cin >> state)
     {
         state.updateVisionInformation();
-        makeMoves();
+        doTurn();
+//        makeMoves();
         endTurn();
     }
 };
@@ -56,20 +60,51 @@ bool Bot::doMoveDirection(const Location & antLoc, int dir)
   {
     state.makeMove( antLoc, dir );
     orders.insert( pair< Location, Location >( newLoc, antLoc ) );
-    printf(">>>>>>> (%d, %d) added to orders\n", newLoc.row, newLoc.col);
     return true;
   }
   else
     return false;
 }
 
+bool Bot::doMoveLocation(const Location & antLoc, const Location & destLoc)
+{
+  array< int, 2 > directions; // Initialization
+
+  int ndirs = state.getDirection(antLoc, destLoc, directions);
+  for ( int i = 0 ; i < ndirs ; ++i )
+    if ( doMoveDirection( antLoc, directions[i] ) )
+    {
+      targets.insert( pair< Location, Location>( destLoc, antLoc ) );
+      return true;
+    }
+
+  return false;
+}
+
 void Bot::doTurn()
 {
-  orders.clear();
+  int distance = 0;
+  uint nFood = state.food.size(), nMyAnts = state.myAnts.size();
+  Route foodRoute;
+  array< Route, nFood*nMyAnts > foodRoutes; 
 
-  for ( uint antIdx = 0 ; antIdx < state.myAnts.size() ; ++antIdx )
-    for ( int d = 0 ; d < TDIRECTIONS ; ++d )
-      if ( doMoveDirection( state.myAnts[ antIdx ], d ) ) break;
+  orders.clear();
+  targets.clear(); 
+
+  for ( uint foodIdx = 0 ; foodIdx < nFood ; ++foodIdx )
+    for ( uint antIdx = 0 ; antIdx < nMyAnts ; ++antIdx )
+    {
+      distance = state.distance( state.myAnts[ antIdx ], state.food[ foodIdx ] );
+      foodRoute = Route( state.myAnts[ antIdx ], state.food[ foodIdx ], distance );
+      foodRoutes[ foodIdx*nMyAnts + antIdx ] = foodRoute;
+    }
+
+  sort( foodRoutes.begin(), foodRoutes.end() );
+
+  for ( uint routeIdx = 0 ; routeIdx < nFood*nMyAnts ; ++routeIdx )
+  {
+    if ( !targets.find( route.getDest() ) )
+  }
 
 }
 
