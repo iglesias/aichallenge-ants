@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#define MAX_SQUARES 200 // maps are limited at most 200x200 squares
+
 /*
     struct for representing a square in the grid.
 */

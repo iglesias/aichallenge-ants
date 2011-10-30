@@ -3,6 +3,7 @@
 
 #include <boost/bimap.hpp>
 #include <map>
+#include <set>
 #include <tuple>
 
 #include "State.h"
@@ -33,6 +34,8 @@ struct Bot
     State state;
 
     std::map< Location, Location > orders;
+
+    std::set< Location > unseen;
 
     // This map tracks the foods targets and associated ants
     TargetsBimap targets;

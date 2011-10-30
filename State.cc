@@ -115,12 +115,12 @@ void State::updateVisionInformation()
     std::queue<Location> locQueue;
     Location sLoc, cLoc, nLoc;
 
-    for(int a=0; a<(int) myAnts.size(); a++)
+    for ( uint antIdx = 0 ; antIdx < myAnts.size() ; ++antIdx )
     {
-        sLoc = myAnts[a];
+        sLoc = myAnts[ antIdx ];
         locQueue.push(sLoc);
 
-        std::vector<std::vector<bool> > visited(rows, std::vector<bool>(cols, 0));
+        vector< vector< bool > > visited( rows, vector< bool >(cols, 0) );
         grid[sLoc.row][sLoc.col].isVisible = 1;
         visited[sLoc.row][sLoc.col] = 1;
 

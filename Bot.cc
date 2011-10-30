@@ -8,8 +8,10 @@ using namespace std;
 //constructor
 Bot::Bot()
 {
-  map< Location, Location > orders;
-  map< Location, Location > targets;
+  // All the locations are unseen at the beginning
+  for ( int row = 0 ; row < state.rows ; ++row )
+    for ( int col = 0 ; col < state.cols ; ++col )
+      unseen.insert( Location(row, col) );
 };
 
 //plays a single game of Ants.
@@ -61,7 +63,6 @@ bool Bot::doMoveDirection(const Location & antLoc, int dir)
   {
     state.makeMove( antLoc, dir );
     orders.insert( pair< Location, Location >( newLoc, antLoc ) );
-    state.bug << "inseerted move towards " << newLoc << endl;
     return true;
   }
   else
@@ -87,9 +88,11 @@ void Bot::doTurn()
 {
   int distance = 0;
   const uint nFood = state.food.size(), nMyAnts = state.myAnts.size();
-  Route foodRoute;
+  Route route;
   vector< Route > foodRoutes( nFood*nMyAnts, make_tuple(Location(), Location(), 0) ); 
   vector< Location >::iterator hillIt;
+  map< Location, Location >::iterator ordersIt;
+  bool movingOut = false;
 
   orders.clear();
   targets.clear(); 
@@ -103,8 +106,8 @@ void Bot::doTurn()
     for ( uint antIdx = 0 ; antIdx < nMyAnts ; ++antIdx )
     {
       distance = state.distance( state.myAnts[ antIdx ], state.food[ foodIdx ] );
-      foodRoute = make_tuple( state.myAnts[ antIdx ], state.food[ foodIdx ], distance );
-      foodRoutes[ foodIdx*nMyAnts + antIdx ] = foodRoute;
+      route = make_tuple( state.myAnts[ antIdx ], state.food[ foodIdx ], distance );
+      foodRoutes[ foodIdx*nMyAnts + antIdx ] = route;
     }
 
   sort( foodRoutes.begin(), foodRoutes.end(), cmpRoutes );
@@ -139,18 +142,60 @@ void Bot::doTurn()
 
   }
 
+  // Remove the locations that are visible
+  set< Location >::iterator unseenIt = unseen.begin();
+  while ( unseenIt != unseen.end() )
+  {
+    if ( state.grid[ unseenIt->row ][ unseenIt->col ].isVisible )
+      unseen.erase( unseenIt++ );
+    else
+      ++unseenIt;
+  }
+
+  state.bug << "there are " << unseen.size() << " unseen locations here" << endl;
+
+  // Explore unseen areas
+  vector< Route > unseenRoutes( unseen.size(), make_tuple(Location(), Location(), 0) );
+  for ( uint antIdx = 0 ; antIdx < state.myAnts.size() ; ++antIdx )
+  {
+    // Check that we are not already moving the ant
+    movingOut = false;
+    for ( ordersIt = orders.begin() ; ordersIt != orders.end() ; ++ordersIt )
+      if ( ordersIt->second == state.myAnts[ antIdx ] )
+      {
+        movingOut = true;
+        break;
+      }
+
+    if ( !movingOut )
+    {
+      int i;
+      for ( i = 0, unseenIt = unseen.begin() ; unseenIt != unseen.end() ; ++unseenIt )
+      {
+        distance = state.distance( state.myAnts[ antIdx ], *unseenIt );
+        route = make_tuple( state.myAnts[ antIdx ], *unseenIt, distance );
+        unseenRoutes[ i++ ] = route;
+      }
+
+      sort( unseenRoutes.begin(), unseenRoutes.end(), cmpRoutes );
+
+      for ( routeIt = unseenRoutes.begin() ; routeIt != unseenRoutes.end() ; ++routeIt )
+        if ( doMoveLocation( get<0>( *routeIt ), get<1>( *routeIt ) ) ) break;
+
+    }
+  }
+
   // Move out from our hills
-  map< Location, Location >::iterator ordersIt;
-  bool movingOut = false;
-  for ( hillIt = state.myHills.begin() ; hillIt < state.myHills.end() ; ++hillIt )
+  for ( hillIt = state.myHills.begin() ; hillIt != state.myHills.end() ; ++hillIt )
   {
     vector< Location >::iterator it = 
-      find(state.myHills.begin(), state.myHills.end(), *hillIt);
+      find(state.myAnts.begin(), state.myAnts.end(), *hillIt);
     if ( it != state.myAnts.end() )
     {
-      // Check that we are not already moving from the hill
+      // Check that we are not already moving the ant
+      movingOut = false;
       for ( ordersIt = orders.begin() ; ordersIt != orders.end() ; ++ordersIt )
-        if ( ordersIt->second == *hillIt)
+        if ( ordersIt->second == *hillIt )
         {
           movingOut = true;
           break;
@@ -162,7 +207,6 @@ void Bot::doTurn()
           if ( doMoveDirection( *hillIt, d ) )
             break;
         }
-
     }
   }
 
