@@ -89,15 +89,16 @@ void Bot::doTurn()
   const uint nFood = state.food.size(), nMyAnts = state.myAnts.size();
   Route foodRoute;
   vector< Route > foodRoutes( nFood*nMyAnts, make_tuple(Location(), Location(), 0) ); 
+  vector< Location >::iterator hillIt;
 
   orders.clear();
   targets.clear(); 
 
   // Prevent stepping on our own hills
-  vector< Location >::iterator hillIt;
   for ( hillIt = state.myHills.begin() ; hillIt < state.myHills.end() ; ++hillIt )
     orders.insert( pair< Location, Location >( *hillIt, Location() ) );
 
+  // Food gathering
   for ( uint foodIdx = 0 ; foodIdx < nFood ; ++foodIdx )
     for ( uint antIdx = 0 ; antIdx < nMyAnts ; ++antIdx )
     {
@@ -137,6 +138,34 @@ void Bot::doTurn()
     }
 
   }
+
+  // Move out from our hills
+  map< Location, Location >::iterator ordersIt;
+  bool movingOut = false;
+  for ( hillIt = state.myHills.begin() ; hillIt < state.myHills.end() ; ++hillIt )
+  {
+    vector< Location >::iterator it = 
+      find(state.myHills.begin(), state.myHills.end(), *hillIt);
+    if ( it != state.myAnts.end() )
+    {
+      // Check that we are not already moving from the hill
+      for ( ordersIt = orders.begin() ; ordersIt != orders.end() ; ++ordersIt )
+        if ( ordersIt->second == *hillIt)
+        {
+          movingOut = true;
+          break;
+        }
+
+      if ( !movingOut )
+        for ( int d = 0 ; d < TDIRECTIONS ; ++d )
+        {
+          if ( doMoveDirection( *hillIt, d ) )
+            break;
+        }
+
+    }
+  }
+
 }
 
 //finishes the turn
