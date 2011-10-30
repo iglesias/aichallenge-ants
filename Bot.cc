@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 
 #include "Bot.h"
@@ -60,6 +61,7 @@ bool Bot::doMoveDirection(const Location & antLoc, int dir)
   {
     state.makeMove( antLoc, dir );
     orders.insert( pair< Location, Location >( newLoc, antLoc ) );
+    state.bug << "inseerted move towards " << newLoc << endl;
     return true;
   }
   else
@@ -74,7 +76,7 @@ bool Bot::doMoveLocation(const Location & antLoc, const Location & destLoc)
   for ( int i = 0 ; i < ndirs ; ++i )
     if ( doMoveDirection( antLoc, directions[i] ) )
     {
-      targets.insert( pair< Location, Location>( destLoc, antLoc ) );
+      targets.insert( TargetsBimap::value_type( destLoc, antLoc ) );
       return true;
     }
 
@@ -84,9 +86,9 @@ bool Bot::doMoveLocation(const Location & antLoc, const Location & destLoc)
 void Bot::doTurn()
 {
   int distance = 0;
-  uint nFood = state.food.size(), nMyAnts = state.myAnts.size();
+  const uint nFood = state.food.size(), nMyAnts = state.myAnts.size();
   Route foodRoute;
-  array< Route, nFood*nMyAnts > foodRoutes; 
+  vector< Route > foodRoutes( nFood*nMyAnts, make_tuple(Location(), Location(), 0) ); 
 
   orders.clear();
   targets.clear(); 
@@ -95,17 +97,41 @@ void Bot::doTurn()
     for ( uint antIdx = 0 ; antIdx < nMyAnts ; ++antIdx )
     {
       distance = state.distance( state.myAnts[ antIdx ], state.food[ foodIdx ] );
-      foodRoute = Route( state.myAnts[ antIdx ], state.food[ foodIdx ], distance );
+      foodRoute = make_tuple( state.myAnts[ antIdx ], state.food[ foodIdx ], distance );
       foodRoutes[ foodIdx*nMyAnts + antIdx ] = foodRoute;
     }
 
-  sort( foodRoutes.begin(), foodRoutes.end() );
+  sort( foodRoutes.begin(), foodRoutes.end(), cmpRoutes );
 
+#ifdef DEBUG
+  state.bug << ">> " << nMyAnts*nFood << " routes computed!" << endl << endl;
+  state.bug << ">> Sorted routes:" << endl;
   for ( uint routeIdx = 0 ; routeIdx < nFood*nMyAnts ; ++routeIdx )
-  {
-    if ( !targets.find( route.getDest() ) )
-  }
+    state.bug << ">>>> " << foodRoutes[ routeIdx ] << endl;
+  state.bug << endl;
+#endif
 
+  TargetsBimap::map_by< FoodLocation >::const_iterator foodIt;
+  TargetsBimap::map_by< AntLocation  >::const_iterator antIt;
+  vector< Route >::iterator routeIt;
+  for ( routeIt = foodRoutes.begin() ; routeIt < foodRoutes.end() ; ++routeIt )
+  {
+
+    foodIt = targets.by< FoodLocation >().find( get<1>( *routeIt ) );
+    if ( foodIt == targets.by< FoodLocation >().end() )  // food location already queried?
+    {
+      antIt = targets.by< AntLocation >().find( get<0>( *routeIt ) );
+      if ( antIt == targets.by< AntLocation >().end() ) // ant already doing something?
+        if ( doMoveLocation( get<0>( *routeIt ), get<1>( *routeIt ) ) )
+        {
+#ifdef DEBUG
+          state.bug << ">> Added move from " << get<0>( *routeIt ) << " to " 
+                                             << get<1>( *routeIt ) << endl;
+#endif
+        }
+    }
+
+  }
 }
 
 //finishes the turn
@@ -116,4 +142,15 @@ void Bot::endTurn()
     state.turn++;
 
     cout << "go" << endl;
-};
+}
+
+bool Bot::cmpRoutes(const Route & lhs, const Route & rhs)
+{
+  return ( std::get<2>(lhs) < std::get<2>(rhs) );
+}
+
+ostream & operator<<(ostream & os, const Route & route)
+{
+  os << get<0>( route ) << " " << get<1>( route ) << " " << get<2>( route); 
+  return os;
+}

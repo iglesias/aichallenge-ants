@@ -73,10 +73,10 @@ int State::getDirection
   int ndirs = 0;
 
   // Check vertical direction
-  if ( antLoc.row < destLoc.row )
+  if ( antLoc.row > destLoc.row )
     // Move to the north
     directions[ ndirs++ ] = 0;
-  else if ( antLoc.row > destLoc.row )
+  else if ( antLoc.row < destLoc.row )
     // Move to the south
     directions[ ndirs++ ] = 2;
 
@@ -85,6 +85,7 @@ int State::getDirection
     // Move to the east
     directions[ ndirs++ ] = 1;
   else if ( antLoc.col > destLoc.col )
+    // Move to the west
     directions[ ndirs++ ] = 3;
 
   return ndirs;

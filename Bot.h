@@ -1,9 +1,29 @@
 #ifndef BOT_H_
 #define BOT_H_
 
+#include <boost/bimap.hpp>
+#include <map>
+#include <tuple>
+
 #include "State.h"
 #include "Location.h"
-#include <map>
+
+using namespace boost::bimaps;
+
+typedef std::tuple< Location, Location, double > Route;
+
+
+// tags
+
+struct AntLocation {};
+struct FoodLocation {};
+
+typedef boost::bimap
+<
+
+  tagged< Location, FoodLocation >, tagged< Location, AntLocation >
+
+> TargetsBimap;
 
 /*
     This struct represents your bot in the game of Ants
@@ -15,7 +35,7 @@ struct Bot
     std::map< Location, Location > orders;
 
     // This map tracks the foods targets and associated ants
-    std::map< Location, Location > targets;
+    TargetsBimap targets;
 
     Bot();
 
@@ -30,6 +50,11 @@ struct Bot
     void doTurn();
 
     void endTurn();     //indicates to the engine that it has made its moves
+
+    static bool cmpRoutes(const Route & lhs, const Route & rhs);
+
 };
+
+std::ostream & operator<<(std::ostream & os, const Route & route);
 
 #endif //BOT_H_

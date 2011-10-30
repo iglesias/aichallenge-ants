@@ -1,6 +1,8 @@
 #ifndef LOCATION_H_
 #define LOCATION_H_
 
+#include <iostream>
+
 /*
     struct for representing locations in the grid.
 */
@@ -35,5 +37,7 @@ struct Location
     }
 
 };
+
+std::ostream & operator<<(std:: ostream & os, const Location & loc);
 
 #endif //LOCATION_H_
