@@ -93,6 +93,11 @@ void Bot::doTurn()
   orders.clear();
   targets.clear(); 
 
+  // Prevent stepping on our own hills
+  vector< Location >::iterator hillIt;
+  for ( hillIt = state.myHills.begin() ; hillIt < state.myHills.end() ; ++hillIt )
+    orders.insert( pair< Location, Location >( *hillIt, Location() ) );
+
   for ( uint foodIdx = 0 ; foodIdx < nFood ; ++foodIdx )
     for ( uint antIdx = 0 ; antIdx < nMyAnts ; ++antIdx )
     {
