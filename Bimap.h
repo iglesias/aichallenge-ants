@@ -8,17 +8,43 @@ class Bimap {
 
   public:
 
-    bool containsKey(const TKey & key);
+    bool containsKey(const TKey & key)
+    {
+      return ( forwardMap.find( key ) != forwardMap.end() );
+    }
 
-    typename std::map< TKey, TValue >::iterator endKey();
+    typename std::map< TKey, TValue >::iterator endKey()
+    {
+      return forwardMap.end();
+    }
 
-    bool containsValue(const TValue & value);
+    bool containsValue(const TValue & value)
+    {
+      return ( reverseMap.find( value ) != reverseMap.end() );
+    }
 
-    typename std::map< TValue, TKey >::iterator endValue();
+    typename std::map< TValue, TKey >::iterator endValue()
+    {
+    return reverseMap.end();
+    }
 
-    bool insert(const TKey & key, const TValue & value);
+    bool insert(const TKey & key, const TValue & value)
+    {
+      if ( !containsKey(key) )
+      {
+        forwardMap.insert( std::pair< TKey, TValue >(key, value) );
+        reverseMap.insert( std::pair< TValue, TKey >(value, key) );
+        return true;
+      }
+      else
+        return false;
+    }
 
-    void clear();
+    void clear()
+    {
+      forwardMap.clear();
+      reverseMap.clear();
+    }
 
   private:
   
@@ -27,7 +53,5 @@ class Bimap {
     std::map< TValue, TKey > reverseMap;
 
 };
-
-#include "Bimap.cpp"
 
 #endif // _BIMAP_H
