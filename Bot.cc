@@ -8,10 +8,6 @@ using namespace std;
 //constructor
 Bot::Bot()
 {
-  // All the locations are unseen at the beginning
-  for ( int row = 0 ; row < state.rows ; ++row )
-    for ( int col = 0 ; col < state.cols ; ++col )
-      unseen.insert( Location(row, col) );
 };
 
 //plays a single game of Ants.
@@ -21,6 +17,12 @@ void Bot::playGame()
     cin >> state;
     state.setup();
     endTurn();
+
+    // All the locations are unseen at the beginning
+    for ( int row = 0 ; row < state.rows ; ++row )
+      for ( int col = 0 ; col < state.cols ; ++col )
+        unseen.insert( Location(row, col) );
+    state.bug << "after the constructor " << unseen.size() << endl;
 
     //continues making moves while the game is not over
     while(cin >> state)
@@ -78,6 +80,7 @@ bool Bot::doMoveLocation(const Location & antLoc, const Location & destLoc)
     if ( doMoveDirection( antLoc, directions[i] ) )
     {
       targets.insert( TargetsBimap::value_type( destLoc, antLoc ) );
+      targetscustom.insert(destLoc, antLoc);
       return true;
     }
 
@@ -143,6 +146,8 @@ void Bot::doTurn()
   }
 
   // Remove the locations that are visible
+  state.bug << "there are " << unseen.size() << " unseen locations here" << endl;
+
   set< Location >::iterator unseenIt = unseen.begin();
   while ( unseenIt != unseen.end() )
   {

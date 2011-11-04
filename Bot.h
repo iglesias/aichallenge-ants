@@ -6,6 +6,7 @@
 #include <set>
 #include <tuple>
 
+#include "Bimap.h"
 #include "State.h"
 #include "Location.h"
 
@@ -39,6 +40,8 @@ struct Bot
 
     // This map tracks the foods targets and associated ants
     TargetsBimap targets;
+
+    Bimap< Location, Location > targetscustom;
 
     Bot();
 
