@@ -1,8 +1,8 @@
 CC=g++
-CFLAGS=-Wall -O3 -funroll-loops -c -std=gnu++0x
+CFLAGS=-Wall -O3 -funroll-loops -c -std=c++0x
 LDFLAGS=-O2 -lm
-SOURCES=Bot.cc MyBot.cc Location.cc State.cc 
-OBJECTS=$(SOURCES:.cc=.o)
+SOURCES=Bot.cpp MyBot.cpp Location.cpp State.cpp
+OBJECTS=$(addsuffix .o, $(basename ${SOURCES}))
 EXECUTABLE=MyBot
 
 #Uncomment the following to enable debugging
@@ -13,12 +13,11 @@ all: $(OBJECTS) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.cc.o: *.h
+.cpp.o: *.h
 	$(CC) $(CFLAGS) $< -o $@
 
-clean: 
-	-rm -f ${EXECUTABLE} ${OBJECTS} *.d
-	-rm -f debug.txt
+clean:
+-rm -f ${EXECUTABLE} ${OBJECTS} *.d
+-rm -f debug.txt
 
 .PHONY: all clean
-

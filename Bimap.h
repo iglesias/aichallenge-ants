@@ -28,6 +28,6 @@ class Bimap {
 
 };
 
-#include "Bimap.cc"
+#include "Bimap.cpp"
 
 #endif // _BIMAP_H
