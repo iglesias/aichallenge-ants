@@ -17,7 +17,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
--rm -f ${EXECUTABLE} ${OBJECTS} *.d
--rm -f debug.txt
+	-rm -f ${EXECUTABLE} ${OBJECTS} *.d
+	-rm -f debug.txt
 
 .PHONY: all clean
