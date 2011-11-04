@@ -18,6 +18,8 @@ class Bimap {
 
     bool insert(const TKey & key, const TValue & value);
 
+    void clear();
+
   private:
   
     std::map< TKey, TValue > forwardMap;

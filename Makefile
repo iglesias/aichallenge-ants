@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -O3 -funroll-loops -c -std=gnu++0x -I /usr/local/boost_1_47_0
+CFLAGS=-Wall -O3 -funroll-loops -c -std=gnu++0x
 LDFLAGS=-O2 -lm
 SOURCES=Bot.cc MyBot.cc Location.cc State.cc 
 OBJECTS=$(SOURCES:.cc=.o)

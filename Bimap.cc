@@ -36,3 +36,10 @@ bool Bimap< TKey, TValue>::insert(const TKey & key, const TValue & value)
   else
     return false;
 }
+
+template < class TKey, class TValue >
+void Bimap< TKey, TValue >::clear()
+{
+  forwardMap.clear();
+  reverseMap.clear();
+}

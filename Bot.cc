@@ -79,8 +79,7 @@ bool Bot::doMoveLocation(const Location & antLoc, const Location & destLoc)
   for ( int i = 0 ; i < ndirs ; ++i )
     if ( doMoveDirection( antLoc, directions[i] ) )
     {
-      targets.insert( TargetsBimap::value_type( destLoc, antLoc ) );
-      targetscustom.insert(destLoc, antLoc);
+      targets.insert(destLoc, antLoc);
       return true;
     }
 
@@ -123,17 +122,13 @@ void Bot::doTurn()
   state.bug << endl;
 #endif
 
-  TargetsBimap::map_by< FoodLocation >::const_iterator foodIt;
-  TargetsBimap::map_by< AntLocation  >::const_iterator antIt;
   vector< Route >::iterator routeIt;
   for ( routeIt = foodRoutes.begin() ; routeIt < foodRoutes.end() ; ++routeIt )
   {
 
-    foodIt = targets.by< FoodLocation >().find( get<1>( *routeIt ) );
-    if ( foodIt == targets.by< FoodLocation >().end() )  // food location already queried?
+    if ( !targets.containsKey( get<1>( *routeIt ) ) )  // food already queried?
     {
-      antIt = targets.by< AntLocation >().find( get<0>( *routeIt ) );
-      if ( antIt == targets.by< AntLocation >().end() ) // ant already doing something?
+      if ( !targets.containsValue( get<0>( *routeIt ) ) ) // ant already doing something?
         if ( doMoveLocation( get<0>( *routeIt ), get<1>( *routeIt ) ) )
         {
 #ifdef DEBUG

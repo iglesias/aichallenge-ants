@@ -1,7 +1,6 @@
 #ifndef BOT_H_
 #define BOT_H_
 
-#include <boost/bimap.hpp>
 #include <map>
 #include <set>
 #include <tuple>
@@ -10,22 +9,8 @@
 #include "State.h"
 #include "Location.h"
 
-using namespace boost::bimaps;
 
 typedef std::tuple< Location, Location, double > Route;
-
-
-// tags
-
-struct AntLocation {};
-struct FoodLocation {};
-
-typedef boost::bimap
-<
-
-  tagged< Location, FoodLocation >, tagged< Location, AntLocation >
-
-> TargetsBimap;
 
 /*
     This struct represents your bot in the game of Ants
@@ -39,9 +24,7 @@ struct Bot
     std::set< Location > unseen;
 
     // This map tracks the foods targets and associated ants
-    TargetsBimap targets;
-
-    Bimap< Location, Location > targetscustom;
+    Bimap< Location, Location > targets;
 
     Bot();
 
